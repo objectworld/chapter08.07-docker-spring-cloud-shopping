@@ -8,9 +8,9 @@ services:
   config-service:
     image: objectworld/config-server:0.0.1-SNAPSHOT
     ports:
-      - "8888:8888"
+      - "8788:8788"
     healthcheck:
-      test: curl --fail http://localhost:8888/customer/docker  || exit 1
+      test: curl --fail http://localhost:8788/customer/docker  || exit 1
       interval: 5s
       timeout: 2s
       retries: 3
@@ -31,7 +31,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
   customer-service:
-    image: objectworld/customer-service:1.2-SNAPSHOT
+    image: objectworld/customer-service:0.0.1-SNAPSHOT
     ports:
       - "8080"
     depends_on:
@@ -44,7 +44,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
   product-service:
-    image: objectworld/product-service:1.2-SNAPSHOT
+    image: objectworld/product-service:0.0.1-SNAPSHOT
     ports:
       - "8080"
     depends_on:
@@ -57,7 +57,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
   order-service:
-    image: objectworld/order-service:1.2-SNAPSHOT
+    image: objectworld/order-service:0.0.1-SNAPSHOT
     ports:
       - "8080"
     depends_on:
@@ -71,18 +71,18 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
   gateway-service:
-    image: objectworld/api-gateway:1.1-SNAPSHOT
+    image: objectworld/api-gateway:0.0.1-SNAPSHOT
     ports:
-      - "8060:8060"
+      - "8222:8222"
     depends_on:
       discovery-service:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: docker
     links:
-      - config-server
-      - discovery-server
-      - customer-server
-      - product-server
+      - config-service
+      - discovery-service
+      - customer-service
+      - product-service
       - order-service
       - zipkin
