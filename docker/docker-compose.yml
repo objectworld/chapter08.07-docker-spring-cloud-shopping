@@ -1,0 +1,88 @@
+services:
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    ports:
+      - "9411:9411"
+  config-service:
+    image: objectworld/config-server:0.0.1-SNAPSHOT
+    ports:
+      - "8888:8888"
+    healthcheck:
+      test: curl --fail http://localhost:8888/customer/docker  || exit 1
+      interval: 5s
+      timeout: 2s
+      retries: 3
+  discovery-service:
+    image: objectworld/discovery-server:0.0.1-SNAPSHOT
+    ports:
+      - "8761:8761"
+    depends_on:
+      config-service:
+        condition: service_healthy
+    links:
+      - config-service
+    healthcheck:
+      test: curl --fail http://localhost:8761/eureka/v2/apps || exit 1
+      interval: 4s
+      timeout: 2s
+      retries: 3
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+  customer-service:
+    image: objectworld/customer-service:1.2-SNAPSHOT
+    ports:
+      - "8080"
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    links:
+      - config-service
+      - discovery-service
+      - zipkin
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+  product-service:
+    image: objectworld/product-service:1.2-SNAPSHOT
+    ports:
+      - "8080"
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    links:
+      - config-service
+      - discovery-service
+      - zipkin
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+  order-service:
+    image: objectworld/order-service:1.2-SNAPSHOT
+    ports:
+      - "8080"
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    links:
+      - config-service
+      - discovery-service
+      - product-service
+      - zipkin
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+  gateway-service:
+    image: objectworld/api-gateway:1.1-SNAPSHOT
+    ports:
+      - "8060:8060"
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    links:
+      - config-server
+      - discovery-server
+      - customer-server
+      - product-server
+      - order-service
+      - zipkin
