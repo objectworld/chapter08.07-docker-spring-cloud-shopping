@@ -1,11 +1,14 @@
 package org.objectworld.shopping.product.domain;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.objectworld.shopping.common.domain.AbstractEntity;
 import org.objectworld.shopping.product.domain.enumeration.ProductStatus;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -40,17 +43,17 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(of = {"name", "description", "price", "status", "salesCounter", "category"}, callSuper=true)
+@EqualsAndHashCode(of = {"name", "description", "price", "status", "salesCounter", "category"})
 @ToString(of = {"name", "description", "price", "status", "salesCounter", "category"}, callSuper=true)
 @Entity
 @SequenceGenerator(
-		name="product_seq_gen",
-		sequenceName="product_seq",
-		initialValue=1,
-		allocationSize=1
+		name="product_seq_gen"
+		, sequenceName="product_seq"
+		, initialValue = 1
+		, allocationSize = 1
 		)
 @Table(name = "product")
-public class Product extends AbstractEntity {
+public class Product {
 
     private static final long serialVersionUID = 1L;
     
@@ -80,6 +83,17 @@ public class Product extends AbstractEntity {
 
     @Column(name = "sales_counter")
     private Integer salesCounter;
+
+
+    @CreatedDate
+    @Column(name = "created_date", nullable = false)
+    @JsonIgnore
+    private Instant createdDate = Instant.now();
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date")
+    @JsonIgnore
+    private Instant lastModifiedDate = Instant.now();
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "product_review"	// 조인 테이블명

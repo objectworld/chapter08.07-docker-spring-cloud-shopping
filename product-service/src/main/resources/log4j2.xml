@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration monitorInterval="30" status="WARN">
+	<Properties>
+		<Property name="LOG_PATTERN">
+			[%d{yyyy-MM-dd HH:mm:ss.SSS}][%-10.-10t(%T)][%-5level][%c{1.}:%M(%L)] %msg%n%throwable
+		</Property>
+	</Properties>
+	<Appenders>
+		<Console follow="true" name="ConsoleAppender" target="SYSTEM_OUT">
+			<PatternLayout pattern="${LOG_PATTERN}" />
+		</Console>
+		<Async name="AsyncRollingAppender" bufferSize="200">
+			<AppenderRef ref="RollingAppender" />
+		</Async>
+		<RollingFile name="RollingAppender"
+				fileName="logs/customer.log"
+				filePattern="logs/customer-%d{yyyy-MM-DD-HH}-%02i.log.gz" append="true"
+				ignoreExceptions="false">
+			<PatternLayout>
+				<Pattern>${LOG_PATTERN}</Pattern>
+			</PatternLayout>
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="40MB" />
+				<TimeBasedTriggeringPolicy />
+			</Policies>
+			<DefaultRolloverStrategy>
+				<Delete basePath="${baseDir}" maxDepth="2">
+					<IfFileName glob="logs/customer.*.log.gz" />
+					<IfLastModified age="60d" />
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Logger additivity="false" level="TRACE" name="org.objectworld">
+			<AppenderRef ref="ConsoleAppender" />
+  			<AppenderRef ref="AsyncRollingAppender" />
+		</Logger>
+		<Logger additivity="false" level="INFO" name="log4jdbc.log4j2">
+			<Filters>
+				<MarkerFilter marker="LOG4JDBC_SQL" onMatch="ACCEPT" onMismatch="NEUTRAL" />
+				<MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="ACCEPT" onMismatch="NEUTRAL" />
+				<MarkerFilter marker="LOG4JDBC_CONNECTION" onMatch="DENY" onMismatch="NEUTRAL" />
+				<MarkerFilter marker="LOG4JDBC_JDBC" onMatch="DENY" onMismatch="NEUTRAL" />
+				<!-- <MarkerFilter marker="LOG4JDBC_SQL" onMatch="DENY" onMismatch="NEUTRAL"/> 
+					<MarkerFilter marker="LOG4JDBC_RESULTSETTABLE" onMatch="DENY" onMismatch="NEUTRAL"/> 
+					<MarkerFilter marker="LOG4JDBC_CONNECTION" onMatch="DENY" onMismatch="NEUTRAL"/> 
+					<MarkerFilter marker="LOG4JDBC_JDBC" onMatch="DENY" onMismatch="NEUTRAL"/> -->
+			</Filters>
+			<AppenderRef ref="ConsoleAppender" />
+  			<AppenderRef ref="AsyncRollingAppender" />
+		</Logger>
+		<Root level="INFO">
+			<AppenderRef ref="ConsoleAppender" />
+  			<AppenderRef ref="AsyncRollingAppender" />
+		</Root>
+	</Loggers>
+</Configuration>

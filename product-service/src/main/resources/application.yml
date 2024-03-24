@@ -1,13 +1,39 @@
-server:
-  port: 0
 spring:
   config:
     import: optional:configserver:http://config-service:8788
     activate:
       on-profile: docker
 ---
+server:
+  port: 0
 spring:
   application:
     name: product-service  
   config:
     import: optional:configserver:http://localhost:8788
+    
+  sql:
+    init:
+      platform : h2
+      mode: always
+  datasource:
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    url: jdbc:log4jdbc:h2:mem:shopping;MODE=Oracle;DATABASE_TO_UPPER=FALSE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password: 
+  # H2 설정
+  h2:
+    console:
+      enabled: true
+      path: /h2admin
+  jpa:
+    hibernate:
+      # JPA Datasource 설정
+      # hibernate가 DDL을 자동으로 생성하는지 여부 : create, create-drop, update, validate, none
+      # 만약 DDL과 DML을 지정하여 생성하고 싶을 경우에는 none으로 설정해야 한다.
+      ddl-auto: none
+    show_sql: false
+    properties:
+      hibernate:
+        # format SQL when show_sql is true
+        format_sql: false

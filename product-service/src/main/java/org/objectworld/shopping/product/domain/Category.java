@@ -1,9 +1,12 @@
 package org.objectworld.shopping.product.domain;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.objectworld.shopping.common.domain.AbstractEntity;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -31,17 +34,17 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of={"name", "description"}, callSuper=true)
+@EqualsAndHashCode(of={"name", "description"})
 @Builder
 @Entity
 @SequenceGenerator(
-		name="category_seq_gen",
-		sequenceName="category_seq",
-		initialValue=1,
-		allocationSize=1	
+		name="category_seq_gen"
+		, sequenceName="category_seq"
+		, initialValue=1
+		, allocationSize=1	
 		)
 @Table(name = "category")
-public class Category extends AbstractEntity {
+public class Category {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -64,4 +67,14 @@ public class Category extends AbstractEntity {
     @JsonIgnore
     @Builder.Default
     private Set<Product> products = new HashSet<Product>();
+    
+    @CreatedDate
+    @Column(name = "created_date", nullable = false)
+    @JsonIgnore
+    private Instant createdDate = Instant.now();
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date")
+    @JsonIgnore
+    private Instant lastModifiedDate = Instant.now();
 }

@@ -1,6 +1,12 @@
 package org.objectworld.shopping.product.domain;
 
+import java.time.Instant;
+
 import org.objectworld.shopping.common.domain.AbstractEntity;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,17 +35,17 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(of = {"title", "description", "rating"}, callSuper=true)
+@EqualsAndHashCode(of = {"title", "description", "rating"})
 @ToString(of = {"title", "description", "rating"}, callSuper=true)
 @Entity
 @SequenceGenerator(
-		name="review_seq_gen",
-		sequenceName="review_seq",
-		initialValue=1,
-		allocationSize=1
+		name="review_seq_gen"
+		, sequenceName="review_seq"
+		, initialValue = 1
+		, allocationSize = 1
 		)
 @Table(name = "review")
-public class Review extends AbstractEntity {
+public class Review {
 
     private static final long serialVersionUID = 1L;
     
@@ -62,6 +68,16 @@ public class Review extends AbstractEntity {
     @Column(name = "rating", nullable = false)
     private Long rating;
 
+    @CreatedDate
+    @Column(name = "created_date", nullable = false)
+    @JsonIgnore
+    private Instant createdDate = Instant.now();
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date")
+    @JsonIgnore
+    private Instant lastModifiedDate = Instant.now();
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinTable(name = "product_review"	// 조인 테이블명
 		, joinColumns = @JoinColumn(name = "review_id")	// 외래 키
